@@ -2,36 +2,44 @@ import numpy as np
 import cv2
 
 from src.encoder.dwt_dct_svd_encoder import *
+from src.encoder.dtcwt_key_encoder import *
 from src.decoder.dwt_dct_svd_decoder import *
+from src.decoder.dtcwt_key_decoder import *
 from src.generator.shuffler import *
 from src.degenerator.de_shuffler import *
 from src.generator.grayscale import *
 from src.degenerator.de_grayscale import *
+from src.generator.corr_shuffler import *
+from src.degenerator.de_corr_shuffler import *
 
 key1 = 0
 
 generators = [
 	Shuffler(key=key1),
-	GrayScale(key=key1)
+	GrayScale(key=key1),
+	CorrShuffler(key=key1)
 ]
 
 degenerators = [
 	DeShuffler(key=key1),
-	DeGrayScale(key=key1)
+	DeGrayScale(key=key1),
+	DeCorrShuffler(key=key1)
 ]
 
 encoders = [
 	DwtDctSvdEncoder(),
+	DtcwtKeyEncoder()
 ]
 
 decoders = [
 	DwtDctSvdDecoder(),
+	DtcwtKeyDecoder()
 ]
 
-idx = 1
-coder_idx = 0
-generator = generators[idx]
-degenerator = degenerators[idx]
+gen_idx = 1
+coder_idx = 1
+generator = generators[gen_idx]
+degenerator = degenerators[gen_idx]
 encoder = encoders[coder_idx]
 decoder = decoders[coder_idx]
 
@@ -69,15 +77,15 @@ wmed_frame = np.clip(wmed_frame, a_min=0, a_max=255)
 wmed_frame = np.around(wmed_frame).astype(np.uint8)
 cv2.imwrite(output_path, wmed_frame)
 
-# decode
+# # decode
 decoded_wm = decoder.decode(yuv)
 
 # degenerate
-ret_payload = degenerator.set_shape(payload.shape).degenerate(wm)
+ret_payload = degenerator.set_shape(payload.shape).degenerate(decoded_wm)
 print("Decoded :", ret_payload)
 cv2.imwrite("degenerate.jpeg", ret_payload)
 
-a = (payload - np.mean(payload)) / (np.std(payload) * len(payload))
-b = (ret_payload - np.mean(ret_payload)) / (np.std(ret_payload))
-c = np.correlate(a, b, 'full')
-print("Maximum correlation: ", np.amax(c))
+# a = (payload - np.mean(payload)) / (np.std(payload) * len(payload))
+# b = (ret_payload - np.mean(ret_payload)) / (np.std(ret_payload))
+# c = np.correlate(a, b, 'full')
+# print("Maximum correlation: ", np.amax(c))

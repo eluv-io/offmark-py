@@ -9,12 +9,12 @@ class DwtDctSvdEncoder:
         self.blk = blk
 
     def read_wm(self, wm):
-        self.wm = wm
+        self.wm = wm[0]
 
     def wm_capacity(self, frame_shape):
         row, col, channels = frame_shape
         block_num = row * col // 64
-        return block_num
+        return (1, block_num)
 
     def encode(self, yuv):
         (row, col, channels) = yuv.shape
