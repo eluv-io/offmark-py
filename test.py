@@ -10,6 +10,9 @@ from src.decoder.dtcwt_key_decoder import *
 from src.encoder.dtcwt_img_encoder import *
 from src.decoder.dtcwt_img_decoder import *
 
+from src.encoder.dct_encoder import *
+from src.decoder.dct_decoder import *
+
 from src.generator.shuffler import *
 from src.degenerator.de_shuffler import *
 
@@ -49,11 +52,11 @@ decoders = [
 	DwtDctSvdDecoder(),
 	DtcwtKeyDecoder(),
 	DtcwtImgDecoder(),
-	DctEncoder()
+	DctDecoder()
 ]
 
 gen_idx = 0
-coder_idx = 2
+coder_idx = 0
 generator = generators[gen_idx]
 degenerator = degenerators[gen_idx]
 encoder = encoders[coder_idx]
@@ -93,7 +96,7 @@ wmed_frame = np.clip(wmed_frame, a_min=0, a_max=255)
 wmed_frame = np.around(wmed_frame).astype(np.uint8)
 cv2.imwrite(output_path, wmed_frame)
 
-bgr = cv2.imread(output_path)
+bgr = cv2.imread(output_path).astype(np.float32)
 yuv = cv2.cvtColor(bgr, cv2.COLOR_BGR2YUV)
 
 # decode

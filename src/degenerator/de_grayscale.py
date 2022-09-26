@@ -13,9 +13,11 @@ class DeGrayScale:
 		return self
 
 	def degenerate(self, wm_bits):
+		wm = wm_bits.flatten()
 		payload = np.zeros(shape=self.payload_len)
 		for i in range(self.payload_len):
-			payload[i] = wm_bits[i::self.payload_len].mean()
+			payload[i] = wm[i::self.payload_len].mean()
 		payload[self.payload_idx] = payload.copy()
-		res = (payload > 0.5).astype(np.uint8) * 255
+		threshold = 0.5 * (np.max(payload) + np.min(payload))
+		res = (payload > threshold).astype(np.uint8) * 255
 		return res.reshape(self.payload_shape)

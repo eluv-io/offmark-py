@@ -3,6 +3,7 @@ import pywt
 import cv2
 
 class DwtDctSvdDecoder:
+
     def __init__(self, key=None, scales=[0,15,0], blk=4):
         self.key = key
         self.scales = scales
@@ -17,7 +18,7 @@ class DwtDctSvdDecoder:
                 continue
             ca, hvd = pywt.dwt2(yuv[:row // 4 * 4,:col // 4 * 4, channel], 'haar')
             self.__decode_frame(ca, self.scales[channel], wm_bits[channel])
-        return wm_bits[1]
+        return np.array(wm_bits[1]).reshape(1, -1)
 
     def __decode_frame(self, frame, scale, wm_bits):
         (row, col) = frame.shape

@@ -11,10 +11,12 @@ class DeShuffler:
 		np.random.RandomState(self.key).shuffle(self.payload_idx)
 		return self
 
-	def degenerate(self, wm_bits):
+	def degenerate(self, wm):
+		wm_bits = wm.flatten()
 		payload = np.zeros(shape=self.payload_len)
 		for i in range(self.payload_len):
 			payload[i] = wm_bits[i::self.payload_len].mean()
 		payload[self.payload_idx] = payload.copy()
-		res = (payload > 0.5).astype(np.uint8)
+		threshold = 0.5 * (np.max(payload) + np.min(payload))
+		res = (payload > threshold).astype(np.uint8)
 		return res

@@ -1,4 +1,5 @@
 import numpy as np
+import warnings
 import math
 
 class GrayScale:
@@ -11,8 +12,12 @@ class GrayScale:
 
 	def generate_wm(self, payload, capacity):
 		size = np.array(capacity).prod()
-		payload = (payload > 127).astype(np.uint8).flatten()
 		wm_len = np.array(payload.shape).prod()
+
+		if wm_len > size:
+			warnings.warn("\nImage size {0} is greater than the encoder's capacity: {1} pixels".format(payload.shape, size), stacklevel=3)
+
+		payload = (payload > 127).astype(np.uint8).flatten()
 		c = int(math.ceil(size / wm_len))
 		np.random.RandomState(self.key).shuffle(payload)
 		wm = np.stack([payload for _ in range(c)], axis=0).flatten()[:size]
