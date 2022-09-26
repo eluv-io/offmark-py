@@ -4,11 +4,11 @@ import dtcwt
 
 class DtcwtImgDecoder:
 
-    def __init__(self, key=None, str=1.0, step=5.0, blk_shape=(35, 30)):
+    def __init__(self, key=None, str=1.0, step=5.0):
         self.key = key
+        default_scale = 1.5
         self.alpha = default_scale * str
         self.step = step
-        self.blk_shape = blk_shape
 
     def decode(self, yuv):
         wmed_transform = dtcwt.Transform2d()
@@ -21,7 +21,7 @@ class DtcwtImgDecoder:
         shape3 = y_coeffs.highpasses[2][:, :, 0].shape
         for i in range(6):
             masks3[i] = cv2.filter2D(np.abs(y_coeffs.highpasses[1][:,:,i]), -1, np.array([[1/4, 1/4], [1/4, 1/4]]))
-            masks3[i] = np.ceil(rebin(masks3[i], shape3) * (1.0 / self.step))
+            masks3[i] = np.ceil(self.rebin(masks3[i], shape3) * (1.0 / self.step))
             masks3[i][masks3[i] == 0] = 0.01
             masks3[i] *= 1.0 / max(12.0, np.amax(masks3[i]))
             inv_masks3[i] = 1.0 / masks3[i]
@@ -38,3 +38,9 @@ class DtcwtImgDecoder:
         wm = t.inverse(dtcwt.Pyramid(lowpass, highpasses))
 
         return wm
+
+    def rebin(self, a, shape):
+        if a.shape[0] % 2 == 1:
+            a = np.vstack((a, np.zeros((1, a.shape[1]))))
+        sh = shape[0], a.shape[0] // shape[0], shape[1], a.shape[1] // shape[1]
+        return a.reshape(sh).mean(-1).mean(1)

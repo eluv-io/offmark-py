@@ -2,28 +2,22 @@ import numpy as np
 import cv2
 import dtcwt
 
-from .utils import rebin, randomize_channel, derandomize_channel
-
-default_scale = 1.5
-
 class DtcwtImgEncoder:
 
-    def __init__(self, key=0, str=1.0, step=5.0, blk_shape=(35, 30)):
+    def __init__(self, key=None, str=1.0, step=5.0):
         self.key = key
+        default_scale = 1.5
         self.alpha = default_scale * str
         self.step = step
-        self.blk_shape = blk_shape
 
     def read_wm(self, wm):
-        (w, h) = self.__infer_wm_shape(frame_shape)
-        wm = wm.reshape(w, h)
         wm_transform = dtcwt.Transform2d()
         wm_coeffs = wm_transform.forward(wm, nlevels=1)
         self.wm_coeffs = wm_coeffs
 
     def wm_capacity(self, frame_shape):
-        (w, h) = self.__infer_wm_shape(frame_shape)
-        return w * h
+        (h, w) = self.__infer_wm_shape(frame_shape)
+        return (h, w)
 
     def encode(self, yuv):
         yuv_transform = dtcwt.Transform2d()
@@ -36,7 +30,7 @@ class DtcwtImgEncoder:
         shape3 = y_coeffs.highpasses[2][:, :, 0].shape
         for i in range(6):
             masks3[i] = cv2.filter2D(np.abs(y_coeffs.highpasses[1][:,:,i]), -1, np.array([[1/4, 1/4], [1/4, 1/4]]))
-            masks3[i] = np.ceil(rebin(masks3[i], shape3) * (1 / self.step))
+            masks3[i] = np.ceil(self.rebin(masks3[i], shape3) * (1 / self.step))
             masks3[i] *= 1.0 / max(12.0, np.amax(masks3[i]))
         for i in range(6):
             coeff = self.wm_coeffs.highpasses[0][:, :, i]
@@ -50,11 +44,17 @@ class DtcwtImgEncoder:
         yuv[:, :, 1] = yuv_transform.inverse(yuv_coeffs)
         return yuv
 
-    def __infer_wm_shape(self, frame_shape):
-        w = (((frame_shape[0] + 1) // 2 + 1) // 2 + 1) // 2
-        h = (((frame_shape[1] + 1) // 2 + 1) // 2 + 1) // 2
-        if w % 2 == 1:
-            w += 1
+    def __infer_wm_shape(self, img_shape):
+        h = (((img_shape[0] + 1) // 2 + 1) // 2 + 1) // 2
+        w = (((img_shape[1] + 1) // 2 + 1) // 2 + 1) // 2
         if h % 2 == 1:
             h += 1
-        return (w, h)
+        if w % 2 == 1:
+            w += 1
+        return (h, w)
+
+    def rebin(self, a, shape):
+        if a.shape[0] % 2 == 1:
+            a = np.vstack((a, np.zeros((1, a.shape[1]))))
+        sh = shape[0], a.shape[0] // shape[0], shape[1], a.shape[1] // shape[1]
+        return a.reshape(sh).mean(-1).mean(1)

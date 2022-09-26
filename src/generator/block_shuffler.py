@@ -1,24 +1,21 @@
 import cv2
-import numpy as np    
+import numpy as np
 
 class BlockShuffler:
-    def __init__(self, key=None):
+    def __init__(self, key=None, blk_shape=(35, 30)):
         self.key = key
-        self.blk_shape = (8, 8)
+        self.blk_shape = blk_shape
 
     def wm_type(self):
         return "grayscale"
 
-    def generate_wm(self, payload, capacity):
-        wm = cv2.resize(payload, (capacity[1], capacity[0]))
-        payload = (payload > 127).astype(np.uint8)
-        payload = payload.astype(np.int32)
-        payload[payload != 255] = -255
-        payload = self.randomize_channel(payload, self.key, blk_shape=self.blk_shape)
-        payload = payload.flatten()
-        wm_len = np.array(payload.shape).prod()
-        c = int(math.ceil(capacity / wm_len))
-        wm = np.stack([payload for _ in range(c)], axis=0).flatten()[:capacity]
+    def generate_wm(self, payload, capacity, shape=(135, 240)):
+        wm = cv2.resize(payload, (shape[1], shape[0]))
+        wm = self.randomize_channel(wm, self.key, blk_shape=self.blk_shape)
+        wm = cv2.resize(wm, (capacity[1], capacity[0]))
+        wm = (wm > 127).astype(np.uint8) * 255
+        wm = wm.astype(np.int32)
+        wm[wm != 255] = -255
         return wm
 
     def randomize_channel(self, channel, key, blk_shape=(8, 8)):

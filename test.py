@@ -2,42 +2,58 @@ import numpy as np
 import cv2
 
 from src.encoder.dwt_dct_svd_encoder import *
-from src.encoder.dtcwt_key_encoder import *
 from src.decoder.dwt_dct_svd_decoder import *
+
+from src.encoder.dtcwt_key_encoder import *
 from src.decoder.dtcwt_key_decoder import *
+
+from src.encoder.dtcwt_img_encoder import *
+from src.decoder.dtcwt_img_decoder import *
+
 from src.generator.shuffler import *
 from src.degenerator.de_shuffler import *
+
 from src.generator.grayscale import *
 from src.degenerator.de_grayscale import *
+
 from src.generator.corr_shuffler import *
 from src.degenerator.de_corr_shuffler import *
+
+from src.generator.block_shuffler import *
+from src.degenerator.de_block_shuffler import *
 
 key1 = 0
 
 generators = [
 	Shuffler(key=key1),
 	GrayScale(key=key1),
-	CorrShuffler(key=key1)
+	CorrShuffler(key=key1),
+	BlockShuffler(key=key1)
 ]
 
 degenerators = [
 	DeShuffler(key=key1),
 	DeGrayScale(key=key1),
-	DeCorrShuffler(key=key1)
+	DeCorrShuffler(key=key1),
+	DeBlockShuffler(key=key1)
 ]
 
 encoders = [
 	DwtDctSvdEncoder(),
-	DtcwtKeyEncoder()
+	DtcwtKeyEncoder(),
+	DtcwtImgEncoder(),
+	DctEncoder()
 ]
 
 decoders = [
 	DwtDctSvdDecoder(),
-	DtcwtKeyDecoder()
+	DtcwtKeyDecoder(),
+	DtcwtImgDecoder(),
+	DctEncoder()
 ]
 
-gen_idx = 1
-coder_idx = 1
+gen_idx = 0
+coder_idx = 2
 generator = generators[gen_idx]
 degenerator = degenerators[gen_idx]
 encoder = encoders[coder_idx]
@@ -77,7 +93,10 @@ wmed_frame = np.clip(wmed_frame, a_min=0, a_max=255)
 wmed_frame = np.around(wmed_frame).astype(np.uint8)
 cv2.imwrite(output_path, wmed_frame)
 
-# # decode
+bgr = cv2.imread(output_path)
+yuv = cv2.cvtColor(bgr, cv2.COLOR_BGR2YUV)
+
+# decode
 decoded_wm = decoder.decode(yuv)
 
 # degenerate

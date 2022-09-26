@@ -2,12 +2,11 @@ import numpy as np
 import cv2
 import dtcwt
 
-default_scale = 10.0
-
 class DtcwtKeyDecoder:
 
     def __init__(self, key=None, str=1.0, step=5.0):
         self.key = key
+        default_scale = 10.0
         self.alpha = default_scale * str
         self.step = step
 
