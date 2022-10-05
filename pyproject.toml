@@ -1,0 +1,35 @@
+[project]
+name = "offmark-py"
+version = "0.1.0"
+description = "The Open Framework for Forensic Watermarking"
+authors = [
+    { name = "Qingyuan Liu", email = "106697538+elv-lqy@users.noreply.github.com" },
+    { name = "Peter Tseng", email = "42591958+elv-peter@users.noreply.github.com" },
+]
+dependencies = [
+    "numpy>=1.23.3",
+    "opencv-python>=4.6.0.66",
+    "pywavelets>=1.4.1",
+    "dtcwt>=0.12.0",
+    "scipy>=1.9.1",
+    "ffmpeg-python>=0.2.0",
+]
+requires-python = ">=3.10,<3.12"
+readme = "README.md"
+license = { text = "MIT" }
+[project.optional-dependencies]
+
+[build-system]
+requires = ["pdm-pep517>=1.0.0"]
+build-backend = "pdm.pep517.api"
+
+
+[tool]
+[tool.pdm]
+[[tool.pdm.source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[tool.pdm.dev-dependencies]
+dev = []
