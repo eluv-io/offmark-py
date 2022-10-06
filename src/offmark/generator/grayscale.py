@@ -15,7 +15,7 @@ class GrayScale:
 		wm_len = np.array(payload.shape).prod()
 
 		if wm_len > size:
-			warnings.warn("\nImage size {0} is greater than the encoder's capacity: {1} pixels".format(payload.shape, size), stacklevel=3)
+			warnings.warn("\nImage size {0} is greater than the embed's capacity: {1} pixels".format(payload.shape, size), stacklevel=3)
 
 		payload = (payload > 127).astype(np.uint8).flatten()
 		c = int(math.ceil(size / wm_len))

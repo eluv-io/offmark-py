@@ -1,7 +1,28 @@
 # offmark-py
 
-## Test
+## Environment
 
-```bash
-python3 test.py
+```shell
+# Dependencies
+pdm install
+
+# Virtual environment
+pdm venv list
+eval $(pdm venv activate your_venv_name)
+```
+
+## Run/Test
+
+```shell
+cd tests
+python mark.py
+python detect.py
+
+python test.py
+```
+
+## Build
+
+```shell
+pdm build
 ```
