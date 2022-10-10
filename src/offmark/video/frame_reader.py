@@ -45,6 +45,7 @@ class FileDecoder(FrameReader):
             ffmpeg
             .input(self.file)
             .output('pipe:', format='rawvideo', pix_fmt='rgb24')
+            .global_args('-loglevel', 'quiet')
             .compile()
         )
         self.ffmpeg = subprocess.Popen(args, stdout=subprocess.PIPE)

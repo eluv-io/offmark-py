@@ -33,6 +33,7 @@ class FileEncoder(FrameWriter):
             .input('pipe:', format='rawvideo', pix_fmt='rgb24', s=f'{width}x{height}')
             .output(self.file, pix_fmt='yuv420p')
             .overwrite_output()
+            .global_args('-loglevel', 'quiet')
             .compile()
         )
         self.ffmpeg = subprocess.Popen(args, stdin=subprocess.PIPE)

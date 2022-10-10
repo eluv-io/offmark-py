@@ -1,15 +1,19 @@
 import cv2
 import numpy as np
 
+
 class BlockShuffler:
     def __init__(self, key=None, blk_shape=(35, 30)):
         self.key = key
         self.blk_shape = blk_shape
 
-    def wm_type(self):
+    @staticmethod
+    def wm_type():
         return "grayscale"
 
     def generate_wm(self, payload, capacity, shape=(135, 240)):
+        """Scrambles the watermark image by shuffling around blocks of pixels.
+        """
         wm = cv2.resize(payload, (shape[1], shape[0]))
         wm = self.randomize_channel(wm, self.key, blk_shape=self.blk_shape)
         wm = cv2.resize(wm, (capacity[1], capacity[0]))

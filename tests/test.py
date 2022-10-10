@@ -52,6 +52,7 @@ decoders = [
     DctDecoder()
 ]
 
+# gen_idx:coder_idx combinations: 0:0, 0:3, 1:0, 1:3, 2:1, 3:2
 gen_idx = 2
 coder_idx = 1
 generator = generators[gen_idx]
@@ -93,6 +94,15 @@ wmed_frame = np.clip(wmed_frame, a_min=0, a_max=255)
 wmed_frame = np.around(wmed_frame).astype(np.uint8)
 cv2.imwrite(output_path, wmed_frame)
 
+# diff with original (scaled for visibility)
+diff = img.astype(np.int32) - wmed_frame.astype(np.int32)
+diff = np.abs(diff)
+diff_max = np.max(diff)
+diff = np.multiply(diff, 255 * 3/diff_max)
+diff = diff.clip(0, 255)
+diff_path = os.path.join(this_dir, 'out', 'diff.jpeg')
+cv2.imwrite(diff_path, diff)
+
 bgr = cv2.imread(output_path).astype(np.float32)
 yuv = cv2.cvtColor(bgr, cv2.COLOR_BGR2YUV)
 
@@ -101,7 +111,7 @@ decoded_wm = decoder.decode(yuv)
 
 # degenerate
 ret_payload = degenerator.set_shape(payload.shape).degenerate(decoded_wm)
-print("Decoded :", ret_payload)
+print("Decoded:", ret_payload)
 cv2.imwrite(os.path.join(this_dir, 'out', 'degenerate.jpeg'), ret_payload)
 
 # a = (payload - np.mean(payload)) / (np.std(payload) * len(payload))
