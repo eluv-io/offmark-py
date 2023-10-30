@@ -18,18 +18,18 @@ requires-python = ">=3.10,<3.12"
 readme = "README.md"
 license = { text = "MIT" }
 [project.optional-dependencies]
+[tool.poetry]
+name = "offmark-py-poetry"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{include = "offmark_py_poetry"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
 
 [build-system]
-requires = ["pdm-pep517>=1.0.0"]
-build-backend = "pdm.pep517.api"
-
-
-[tool]
-[tool.pdm]
-[[tool.pdm.source]]
-url = "https://pypi.org/simple"
-verify_ssl = true
-name = "pypi"
-
-[tool.pdm.dev-dependencies]
-dev = []
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
